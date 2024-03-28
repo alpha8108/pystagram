@@ -10,7 +10,7 @@
 <div id="feeds" class='post-container'>
     <!-- 전달된 Post QuerySet 객체를 순회 -->
     {% for post in posts %}
-        <article class="post">
+        <article id="post-{{ post.id }}" class="post">
             <header class="post-header">
                 {% if post.user.profile_image %}
                     <img src="{{ post.user.profile_image.url }}" alt="">
@@ -40,10 +40,10 @@
             <div class="post-content">
                 {{ post.content|linebreaksbr }}
             </div>
-            <!-- 좋아요/댓글 버튼 표시 -->
+            <!-- 좋아요 버튼/댓글 수 표시 -->
             <div class="post-buttons">
                 <button>Likes(0)</button>
-                <span>Comments(0)</span>
+                <span>Comments({{ post.comment_set.count }})</span>
             </div>
             <!-- 댓글 목록 표시  -->
             <div class="post-comments">
@@ -60,8 +60,10 @@
             <!-- 포스트 작성일자, 댓글 입력창 표시  -->
             <small>{{ post.created }}</small>
             <div class='post-comment-create'>
-                <form action="" method="POST">
+                <form action="/posts/comment_add/" method="POST">
                     {% csrf_token %}
+                    <!-- 사용자가 직접 입력하지 않는 고정된 데이터를 form내부에 위치 -->
+                    <input type="hidden" name="post" value="{{ post.id }}">
                     <!-- 전달된 CommentForm의 필드들 중, "content" 필드만 렌더링 -->
                     {{ comment_form.content }}
                     <button type="submit">게시</button>
