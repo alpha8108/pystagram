@@ -27,7 +27,8 @@ class SignupForm(forms.Form):
         if password1 != password2:
             self.add_error('password2', '비밀번호와 비밀번호 확인란의 값이 다릅니다.')
 
-#회원가입과 관련된 모든 데이터가 SignupForm에 존재하므로 해당 폼이 회원가입 기능까지 담당해도 괜찮을 것 같다고 해서 코드 리팩터링
+#회원가입과 관련된 모든 데이터가 SignupForm에 존재하므로 
+#해당 폼이 회원가입 기능까지 담당해도 괜찮을 것 같다고 해서 코드 리팩터링
     def save(self):
         username = self.cleaned_data['username']
         password1 = self.cleaned_data['password1']
@@ -41,4 +42,8 @@ class SignupForm(forms.Form):
             short_description=short_description,
         )
         return user
+    
+# Form은 사용자가 요청에 전달한 데이터들을 검증하고 가공하는데 특화된 기능이다.
+# view함수가 지나치게 방대해지는 것을 막는 효과도 있으니,
+# 사용자가 전달한 데이터를 처리할 떄는 Form을 사용하도록 하자. 
         
