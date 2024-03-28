@@ -60,8 +60,12 @@
             <!-- 포스트 작성일자, 댓글 입력창 표시  -->
             <small>{{ post.created }}</small>
             <div class='post-comment-create'>
-                <input type="text" placeholder="댓글 달기...">
-                <button type="submit">게시</button>
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <!-- 전달된 CommentForm의 필드들 중, "content" 필드만 렌더링 -->
+                    {{ comment_form.content }}
+                    <button type="submit">게시</button>
+                </form>
             </div>
 
         </article>
