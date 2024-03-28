@@ -1,18 +1,22 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <h1>login</h1>
-    <form action="" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <!-- as_p 메서드는 각각의 필드들을 <p>요소 내부에 생성한다 -->
-        <button type="submit">로그인</button>
-    </form>
+    <div id="login">
+        <form action="" method="POST">
+            <h1>Pystagram</h1>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <!-- as_p 메서드는 각각의 필드들을 <p>요소 내부에 생성한다 -->
+            <button type="submit" class="btn btn-login">로그인</button>
+        </form>
+    </div>
     
 </body>
 </html>
