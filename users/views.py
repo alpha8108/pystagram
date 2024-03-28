@@ -48,30 +48,22 @@ def logout_view(request):
     return redirect('/users/login')
 
 def signup(request):
+    # POST요청 시, form이 유효하다면 최종적으로 redirect 처리된다. 
     if request.method == 'POST':
         form = SignupForm(data=request.POST, files=request.FILES)
         #Form에 에러가 없다면 곧바로 User를 생성하고 로그인 후 피드 페이지로 이동한다.
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password1 = form.cleaned_data['password1']
-            password2 = form.cleaned_data['password2']
-            profile_image = form.cleaned_data['profile_image']
-            short_description = form.cleaned_data['short_description']
-            user = User.objects.create_user(
-                username=username,
-                password=password1,
-                profile_image=profile_image,
-                short_description=short_description,
-            )
+            user = form.save()
             login(request, user)
             return redirect('/posts/feeds/')
-        
-            #Form 에러가 존재한다면, 에러를 포함한 form을 사용해 회원가입 페이지를 다시 렌더링 
-        else:
-            context = {'form': form }
-            return render(request, 'users/signup.html', context)
-    #GET 요청에서는 빈 Form을 보여준다.
+        #POST 요청에서 form이 유효하지 않다면, 아래의 context = ... 부분으로 이동한다.
+
+    # GET 요청 시, 빈 form을 생성한다.      
     else:
         form = SignupForm()
+
+    # context로 전달되는 form은 두 가지 경우가 존재한다.
+    # 1. POST 요청에서 생성된 form이 유효하지 않은 경우 -> 에러를 포함한 form이 사용자에게 보여진다.
+    # 2. GET 요청으로 빈 form이 생성된 경우 -> 빈 form이 사용자에게 보여진다.
         context = {'form': form }
         return render(request, 'users/signup.html', context)
