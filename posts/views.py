@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect 
-from posts.models import Post
+from django.http import HttpResponseRedirect, HttpResponseForbidden
+from posts.models import Post, Comment
 from posts.forms import CommentForm
 
 # Create your views here.
@@ -46,3 +46,13 @@ def comment_add(request):
         # redirect 함수에서는 URL뒤에 추가 문자열을 붗이는 것을 허용하지 않으므로 
         # redirect시킬 URL뒤에 #post-2 와 같은 문자열을 추가하려면 HttpResponseRedirect 객체를 직접 사용한것 
         return HttpResponseRedirect(f"/posts/feeds/#post-{comment.post.id}") 
+    
+@require_POST
+def comment_delete(request, comment_id):
+        comment = Comment.objects.get(id=comment_id)
+        if comment.user == request.user:
+            comment.delete()
+            return HttpResponseRedirect(f'/posts/feeds/#post-{comment.post.id}')
+        else:
+            return HttpResponseForbidden('이 댓글을 삭제할 권한이 없습니다.')
+    

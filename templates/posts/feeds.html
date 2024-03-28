@@ -53,6 +53,14 @@
                     <li>
                         <span>{{ comment.user.username }}</span>
                         <span>{{ comment.content }}</span>
+
+                        <!-- 댓글 삭제 Form 추가/ 로그인한 사용자가 댓쓴이와 같으면 삭제버튼 활성화 -->
+                        {% if user == comment.user %}
+                            <form method='POST' action="/posts/comment_delete/{{ comment.id }}/">
+                                {% csrf_token %}
+                                <button type="submit">삭제</button>
+                            </form>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
