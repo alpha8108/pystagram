@@ -2,7 +2,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from posts.models import Post, Comment
-from posts.forms import CommentForm
+from posts.forms import CommentForm, PostForm
 
 # Create your views here.
 
@@ -56,3 +56,7 @@ def comment_delete(request, comment_id):
         else:
             return HttpResponseForbidden('이 댓글을 삭제할 권한이 없습니다.')
     
+def post_add(request):
+     form = PostForm()
+     context = {"form": form}
+     return render(request, 'posts/post_add.html', context)

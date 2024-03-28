@@ -1,5 +1,5 @@
 from django import forms 
-from posts.models import Comment
+from posts.models import Comment, Post
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -10,5 +10,12 @@ class CommentForm(forms.ModelForm):
 # Form클래스로 위와같이 정의하여 비슷한 데이터를 받으려면
 # class CommentForm(forms.Form):
 #       content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': '댓글 달기...'})) 
-#이런식으로 정의해야한다. 
+#이런식으로 정의해야한다.  
+        
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['content',]
+
         
