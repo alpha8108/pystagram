@@ -12,12 +12,25 @@ def login_view(request):
     if request.method == 'POST':
     # LoginForm 인스턴스를 만들며, 입력 데이터는 request.POST를 사용
         form = LoginForm(data=request.POST) # 이렇게 data 인수를 채운 채로 생성된 form은 해당 data의 유효성을 검증하기 위해 사용된다.
+        # LoginForm에 전달된 데이터가 유효하다면
+        if form.is_valid():
+            #username과 password 값을 가져와 변수에 할당
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
 
-        #LoginForm에 들어온 데이터가 적절한지 유효성 검사 
-        print('form.is_valid():',form.is_valid()) # is_valid 메서드를 실행하기 전에는 cleaned_data에 접근할 수 없음 
+            # username, password에 해당하는 사용자가 있는지 검사
+            user = authenticate(username=username, password=password)
 
-        #유효성 검사 이후에는 cleaned_data에서 데이터를 가져와 사용 
-        print("form.cleaned_data:", form.cleaned_data)
+            #해당 사용자가 존재한다면 
+            if user: 
+                #로그인 처리 후, 피드 페이지로 redirect
+                login(request, user)
+                return redirect('/posts/feeds/')
+            # 사용자가 없다면 '실패했습니다' 로그 출력
+            else:
+                print("로그인에 실패했습니다.")
+
+        #어떤 경우든 실패한 경우(데이터 검증, 사용자 검사) 다시 LoginForm을 사용한 로그인 페이지 렌더링
         context = {"form": form }
         return render(request, 'users/login.html', context)
     else:
