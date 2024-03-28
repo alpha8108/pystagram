@@ -26,4 +26,19 @@ class SignupForm(forms.Form):
         password2 = self.cleaned_data['password2']
         if password1 != password2:
             self.add_error('password2', '비밀번호와 비밀번호 확인란의 값이 다릅니다.')
+
+#회원가입과 관련된 모든 데이터가 SignupForm에 존재하므로 해당 폼이 회원가입 기능까지 담당해도 괜찮을 것 같다고 해서 코드 리팩터링
+    def save(self):
+        username = self.cleaned_data['username']
+        password1 = self.cleaned_data['password1']
+        password2 = self.cleaned_data['password2']
+        profile_image = self.cleaned_data['profile_image']
+        short_description = self.cleaned_data['short_description']
+        user = User.objects.create_user(
+            username=username,
+            password=password1,
+            profile_image=profile_image,
+            short_description=short_description,
+        )
+        return user
         
