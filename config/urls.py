@@ -23,7 +23,8 @@ from .views import *
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', index),
-    path('users/', include('users.urls'))
+    path('users/', include('users.urls')),
+    path('posts/', include('posts.urls')),
 ]
 
 urlpatterns += static(
