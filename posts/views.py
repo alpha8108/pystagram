@@ -2,7 +2,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.urls import reverse 
 from django.http import HttpResponseRedirect, HttpResponseForbidden
-from posts.models import Post, Comment, PostImage
+from posts.models import Post, Comment, PostImage, HashTag
 from posts.forms import CommentForm, PostForm
 
 # Create your views here.
@@ -81,13 +81,39 @@ def post_add(request):
                 # Model의 ImageField 부분에 곧바로 할당한다 
                 PostImage.objects.create(post=post, photo=image_file)
 
+            # 'tags'에 전달된 문자열을 분리해 HashTag 생성 
+                tag_string = request.POST.get("tags")
+                if tag_string:
+                    tag_names = [tag_name.strip() for tag_name in tag_string.split(",")]
+                    for tag_name in tag_names:
+                        tag, _ = HashTag.objects.get_or_create(name=tag_name)
+                        # get_or_create로 생성하거나 가져온 HashTag객체를 Post의 tags에 추가한다.
+                        post.tags.add(tag)
                 # 모든 PostImage의 Post의 생성이 완료되면
                 # 피드 페이지로 이동하며 생성된 Post의 위치로 스크롤되도록 한다
-            url = reverse('posts:feeds') + f'#post-{post.id}'
-            return HttpResponseRedirect(url)
+                url = reverse('posts:feeds') + f'#post-{post.id}'
+                return HttpResponseRedirect(url)
         #GET요청일 때는 빈 form을 보여주도록 한다.
     else:
         form = PostForm()
 
         context = {"form": form}
         return render(request, 'posts/post_add.html', context)
+    
+def tags(request, tag_name):
+    try:
+        tag = HashTag.objects.get(name=tag_name)
+    except HashTag.DoesNotExist:
+        #tag_name에 해당하는 HashTag를 찾지 못한 경우, 빈 QuerySet을 돌려준다
+        posts = Post.objects.none()
+    else:
+        # tags(m2m 필드)에 찾은 Hashtag 객체가 있는 Post들을 필터
+        posts = Post.objects.filter(tags=tag)
+
+        # context로 Template에 필터링 된 Post QuerySet을 넘겨주며,
+        # 어떤 tag_name으로 검색했는지도 넘겨준다 
+    context = {
+        "tag_name": tag_name,
+        "posts": posts,
+    }
+    return render(request, "posts/tags.html", context)
