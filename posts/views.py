@@ -1,5 +1,6 @@
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
+from django.urls import reverse 
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from posts.models import Post, Comment, PostImage
 from posts.forms import CommentForm, PostForm
@@ -9,7 +10,7 @@ from posts.forms import CommentForm, PostForm
 def feeds(request):
     #요청에 포함된 사용자가 로그인하지 않은 경우(AnonymousUser인 경우)
     if not request.user.is_authenticated:
-        return redirect('/users/login/')
+        return redirect('users:login')
     
     # 모든 글 목록을 템플릿으로 전달 
     posts = Post.objects.all()
@@ -45,14 +46,20 @@ def comment_add(request):
         # redirect함수를 쓸 수 없기에 대신 HttpResponseRedirect 객체를 사용하게 된 것.
         # redirect 함수에서는 URL뒤에 추가 문자열을 붗이는 것을 허용하지 않으므로 
         # redirect시킬 URL뒤에 #post-2 와 같은 문자열을 추가하려면 HttpResponseRedirect 객체를 직접 사용한것 
-        return HttpResponseRedirect(f"/posts/feeds/#post-{comment.post.id}") 
+        
+        # redirect()함수가 아닌 HttpResponseRedirect는 URL pattern name을 사용할 수 없다.
+        # 이 경우, reverse()로 URL을 만든 후, 뒤에 추가로 붙일 주소를 직접 입력해야 한다 
+        
+        url = reverse("posts:feeds") + f'#post-{comment.post.id}' 
+        return HttpResponseRedirect(url) 
     
 @require_POST
 def comment_delete(request, comment_id):
         comment = Comment.objects.get(id=comment_id)
         if comment.user == request.user:
             comment.delete()
-            return HttpResponseRedirect(f'/posts/feeds/#post-{comment.post.id}')
+            url = reverse('posts:feeds') + f'#post-{comment.post.id}'
+            return HttpResponseRedirect(url)
         else:
             return HttpResponseForbidden('이 댓글을 삭제할 권한이 없습니다.')
     
@@ -76,7 +83,7 @@ def post_add(request):
 
                 # 모든 PostImage의 Post의 생성이 완료되면
                 # 피드 페이지로 이동하며 생성된 Post의 위치로 스크롤되도록 한다
-            url = f'/posts/feeds/#post-{post.id}'
+            url = reverse('posts:feeds') + f'#post-{post.id}'
             return HttpResponseRedirect(url)
         #GET요청일 때는 빈 form을 보여주도록 한다.
     else:
