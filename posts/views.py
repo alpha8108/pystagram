@@ -28,30 +28,22 @@ def comment_add(request):
     if form.is_valid():
         # commit=False 옵션으로 메모리상에 Comment 객체 생성
         comment = form.save(commit=False)
-
         # Comment 생성에 필요한 사용자 정보를 request에서 가져와 할당
         comment.user = request.user
-
         #DB에 Comment객체 저장
         comment.save()
 
-        #생성된 Comment의 정보 확인
-        print(comment.id)
-        print(comment.content)
-        print(comment.user)
-        #생성 완료 후에는 피드 페이지로 다시 이동
-        #return redirect("/posts/feeds/")
-        # 생성한 comment에서 연결된 post정보를 가져와서 id 값을 사용 / 
-        # 댓글 작성이 완료되고 피드페이지에서 스크롤될 위치를 지정할 수 있으려면
-        # redirect함수를 쓸 수 없기에 대신 HttpResponseRedirect 객체를 사용하게 된 것.
-        # redirect 함수에서는 URL뒤에 추가 문자열을 붗이는 것을 허용하지 않으므로 
-        # redirect시킬 URL뒤에 #post-2 와 같은 문자열을 추가하려면 HttpResponseRedirect 객체를 직접 사용한것 
+        # URL로 'next' 값을 전달 받았다면, 댓글 작성 완료 후 전달받은 값으로 이동한다
+        if request.GET.get("next"):
+            url_next = request.GET.get('next')
         
-        # redirect()함수가 아닌 HttpResponseRedirect는 URL pattern name을 사용할 수 없다.
-        # 이 경우, reverse()로 URL을 만든 후, 뒤에 추가로 붙일 주소를 직접 입력해야 한다 
-        
-        url = reverse("posts:feeds") + f'#post-{comment.post.id}' 
-        return HttpResponseRedirect(url) 
+        # 'next' 값을 전달받지 않았다면, 피드 페이지의 글 위치로 이동한다.(피드페이지에서 댓글작성한경우)
+        else:
+            url_next = reverse('posts:feeds') + f'#post-{comment.post.id}'
+        return HttpResponseRedirect(url_next)
+    
+    # 바로 위에 if-else를 or 로 변환한 코드 
+ # url_next = request.GET.get('next') or reverse('posts:feeds') + f'#post-{comment.post.id}' 
     
 @require_POST
 def comment_delete(request, comment_id):
@@ -117,3 +109,10 @@ def tags(request, tag_name):
         "posts": posts,
     }
     return render(request, "posts/tags.html", context)
+
+def post_detail(request, post_id):
+    post = Post.objects.get(id=post_id)
+    comment_form = CommentForm()
+    context = {"post":post,
+               "comment_form": comment_form,}
+    return render(request, 'posts/post_detail.html', context)

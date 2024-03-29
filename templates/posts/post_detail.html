@@ -1,13 +1,12 @@
 {% extends 'base.html' %}
-{% load custom_tags %}
 
 {% block content %}
     {% include 'nav.html' %}
 <div id="feeds" class='post-container'>
-    {% for post in posts %}
-        {% url 'posts:feeds' as action_redirect_to %}
-        {% include 'posts/post.html' with action_redirect_url=action_redirect_to|concat:'#post-'|concat:post.id %}
-    {% endfor %}
+    <!-- post.html을 include로 가져오면서 댓글 작성 후 이동할 URL 값을 전달한다?  -->
+    <!-- as 뒤에 적은건 변수명이고 거기로 할당되는 템플릿 문법!!! -->
+    {% url 'posts:post_detail' post.id as action_redirect_to %}  
+    {% include 'posts/post.html' with action_redirect_url=action_redirect_to %}  
 </div>
 
 <!-- block content 영역 안쪽에서 작성해야함  -->
