@@ -16,6 +16,15 @@ class CommentInline(admin.TabularInline):
 class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 1
+
+class LikeUserInline(admin.TabularInline):
+    model = Post.like_users.through
+    verbose_name = "좋아요 한 User"
+    verbose_name_plural = f"{verbose_name} 목록"
+    extra = 1
+
+    def has_change_permission(self, request, obj=None):
+        return False
     
 
 @admin.register(Post)
@@ -27,6 +36,7 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [
         CommentInline,
         PostImageInline,
+        LikeUserInline,
     ]
     # Post변경 화면에서 ManyToManyField를 Checkbox로 출력
     formfield_overrides = {

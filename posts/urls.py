@@ -10,4 +10,5 @@ urlpatterns = [
     path('post_add/', post_add, name='post_add'),
     path('tags/<str:tag_name>', tags, name="tags"),
     path('post_detail/<int:post_id>', post_detail, name='post_detail'),
+    path("<int:post_id>/like/", post_like, name="post_like"),
 ]
