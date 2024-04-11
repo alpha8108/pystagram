@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_slider.html' %}
 {% load custom_tags %}
 
 {% block content %}
@@ -10,11 +10,4 @@
     {% endfor %}
 </div>
 
-<!-- block content 영역 안쪽에서 작성해야함  -->
-<script>
-    const elms = document.getElementsByClassName('splide')
-    for (let i = 0; i < elms.length; i++) {
-        new Splide(elms[i]).mount();
-    }
-</script>
 {% endblock %}
